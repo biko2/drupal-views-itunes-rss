@@ -4,8 +4,10 @@ namespace Drupal\itunes_rss\Plugin\views\row;
 
 use Drupal\Core\Field\EntityReferenceFieldItemList;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 use Drupal\file\Entity\File;
 use Drupal\file\Plugin\Field\FieldType\FileFieldItemList;
+use Drupal\media\Entity\Media;
 use Drupal\views\Plugin\views\row\RssFields;
 use function strtolower;
 
@@ -156,10 +158,24 @@ class ItunesRssFields extends RssFields {
     foreach ($fields as $field) {
       if ($this->getField($row_index, $this->options['itunes'][$this->getItunesFieldMachineName($field)]) !== '') {
         $value = $this->getField($row_index, $this->options['itunes'][$this->getItunesFieldMachineName($field)]);
-        $item->elements[] = [
-          'key' => 'itunes:' . $field,
-          'value' => $value,
-        ];
+
+        if ($field === 'image') {
+          /** @var \Drupal\media\Entity\Media $media_image */
+          $media_image = Media::load((string) $value);
+          $fid = $media_image->getSource()->getSourceFieldValue($media_image);
+          $file = File::load($fid);
+
+          $item->elements[] = [
+            'key' => 'itunes:' . $field,
+            'attributes' => ['href' => $file->url()],
+          ];
+        }
+        else {
+          $item->elements[] = [
+            'key' => 'itunes:' . $field,
+            'value' => $value,
+          ];
+        }
       }
     }
 
