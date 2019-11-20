@@ -61,6 +61,7 @@ class ItunesRssFields extends RssFields {
       'image',
       'isClosedCaptioned',
       'order',
+      'language'
     ];
 
     return $fields;
