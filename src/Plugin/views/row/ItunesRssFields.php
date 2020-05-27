@@ -140,15 +140,15 @@ class ItunesRssFields extends RssFields {
 
     if ($this->options['enclosure_field']) {
       $field_name = $this->options['enclosure_field'];
-      $entity = $this->view->result[$row_index]->_entity;
+      $entity = $row->_entity;
 
-      if ($entity->$field_name instanceof EntityReferenceFieldItemList) {
+      if ($entity->get($field_name) instanceof EntityReferenceFieldItemList) {
         /** @var \Drupal\media\Entity\Media $media */
-        $media = $entity->$field_name->entity;
+        $media = $row->_relationship_entities[$field_name];
         $file = File::load($media->getSource()->getSourceFieldValue($media));
       }
 
-      if ($entity->$field_name instanceof FileFieldItemList) {
+      if ($entity->get($field_name) instanceof FileFieldItemList) {
         $value = $entity->$field_name->getValue();
         $file = File::load($value[0]['target_id']);
       }
