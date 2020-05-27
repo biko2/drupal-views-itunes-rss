@@ -117,6 +117,21 @@ class ItunesRssFields extends RssFields {
    */
   public function render($row) {
     $build = parent::render($row);
+
+    // Views relation is not mandatory, skip row processing if audio is not present
+    if (empty($row->_relationship_entities)) {
+      return $build;
+    }
+
+    $related_media = array_filter($row->_relationship_entities, function ($related_entity) {
+      return $related_entity instanceof \Drupal\media\Entity\Media;
+    });
+
+    // Skip row processing if media relation is not present
+    if (empty($related_media)) {
+      return $build;
+    }
+
     static $row_index;
     if (!isset($row_index)) {
       $row_index = 0;
